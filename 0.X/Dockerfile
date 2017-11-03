@@ -39,9 +39,11 @@ RUN apk add --no-cache ca-certificates gnupg openssl libcap && \
 RUN mkdir -p /vault/logs && \
     mkdir -p /vault/file && \
     mkdir -p /vault/config && \
+    mkdir -p /vault/dev && \
     chgrp -R 0 /vault && \
-    chmod -R g=u /vault
-
+    chmod -R g=u /vault && \
+    setcap cap_ipc_lock=+ep $(readlink -f $(which vault)) && \
+    chmod g=u /etc/passwd
 
 # Expose the logs directory as a volume since there's potentially long-running
 # state in there
