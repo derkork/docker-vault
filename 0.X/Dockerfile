@@ -8,11 +8,6 @@ ENV VAULT_VERSION=0.8.3
 # to provide HashiCorp-built versions of basic utilities like dumb-init and gosu.
 ENV DOCKER_BASE_VERSION=0.0.4
 
-# Create a vault user and group first so the IDs get set the same way,
-# even as the rest of this may change over time.
-RUN addgroup vault && \
-    adduser -S -G vault vault
-
 # Set up certificates, our base tools, and Vault.
 RUN apk add --no-cache ca-certificates gnupg openssl libcap && \
     gpg --keyserver pgp.mit.edu --recv-keys 91A6E7F85D05C65630BEF18951852D87348FFC4C && \
@@ -44,7 +39,9 @@ RUN apk add --no-cache ca-certificates gnupg openssl libcap && \
 RUN mkdir -p /vault/logs && \
     mkdir -p /vault/file && \
     mkdir -p /vault/config && \
-    chown -R vault:vault /vault
+    chgrp -R 0 /vault && \
+    chmod -R g=u /vault
+
 
 # Expose the logs directory as a volume since there's potentially long-running
 # state in there
